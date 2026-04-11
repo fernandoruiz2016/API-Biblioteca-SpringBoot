@@ -1,0 +1,23 @@
+package gestion.biblioteca.mapper;
+
+import org.mapstruct.*;
+import gestion.biblioteca.dto.request.AfpRequestDto;
+import gestion.biblioteca.dto.response.AfpResponseDto;
+import gestion.biblioteca.entity.Afp;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface AfpMapper {
+
+    @Mapping(target = "idAfp", ignore = true)
+    Afp toEntity(AfpRequestDto afpRequestDto);
+
+    AfpResponseDto toResponse(Afp afp);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "idAfp", ignore = true)
+    void updateFromRequest(AfpRequestDto afpRequestDto, @MappingTarget Afp afp);
+
+    List<AfpResponseDto> toResponseList(List<Afp> afps);
+}
