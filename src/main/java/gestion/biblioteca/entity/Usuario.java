@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table (name = "tm_usuario")
@@ -20,13 +22,10 @@ public class Usuario {
     @Column(name = "nidusuario")
     private Long idUsuario;
 
-    @Column(name = "snombre", nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "susername", nullable = false, unique = true, length = 20)
+    private String username;
 
-    @Column(name = "sapellido", nullable = false, length = 100)
-    private String apellido;
-
-    @Column(name = "semail", nullable = false, unique = true, length = 150)
+    @Column(name = "semail", nullable = false, unique = true, length = 30)
     private String email;
 
     @Column(name = "spassword", nullable = false, length = 255)
@@ -56,9 +55,15 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private List<Prestamo> prestamos;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "nidrol", nullable = false)
-    private Rol rol;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "tt_usuario_rol",
+            joinColumns = @JoinColumn(name = "nidusuario"),
+            inverseJoinColumns = @JoinColumn(name = "nidrol")
+    )
+
+    @Builder.Default
+    private Set<Rol> roles = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

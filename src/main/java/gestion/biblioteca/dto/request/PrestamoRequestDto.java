@@ -1,33 +1,36 @@
 package gestion.biblioteca.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class PrestamoRequestDto {
-    @NotNull(message = "El ID del libro es obligatorio")
-    private Long idLibro;
+@Schema(description= "DTO para las solicitudes de Préstamos")
+public record PrestamoRequestDto(
+        @NotNull(message = "El ID del libro es obligatorio")
+        @Schema(description = "N° de ID del libro", example = "5")
+        Long idLibro,
 
-    @NotNull(message = "El ID del usuario es obligatorio")
-    private Long idUsuario;
+        @NotNull(message = "El ID del usuario es obligatorio")
+        @Schema(description = "N° de ID del usuario", example = "2")
+        Long idUsuario,
+        
+        @NotNull(message = "La fecha de préstamo es obligatoria")
+        @PastOrPresent(message = "La fecha de préstamo no puede ser futura")
+        @Schema(description = "Fecha y hora en que se entrega el libro", example = "2026-04-12T15:30:00")
+        LocalDateTime fechaPrestamo,
+        
+        @NotNull(message = "La fecha de devolución esperada es obligatoria")
+        @Future(message = "La fecha de devolución esperada debe ser una fecha futura")
+        @Schema(description = "Fecha límite pactada para la devolución", example = "2026-04-19T18:00:00")
+        LocalDateTime fechaDevolucionEsperada,
 
-    @NotNull(message = "La fecha de préstamo es obligatoria")
-    @PastOrPresent(message = "La fecha de préstamo no puede ser futura")
-    private LocalDateTime fechaPrestamo;
-
-    @NotNull(message = "La fecha de devolución esperada es obligatoria")
-    @Future(message = "La fecha de devolución esperada debe ser una fecha futura")
-    private LocalDateTime fechaDevolucionEsperada;
-
-    private LocalDateTime fechaDevolucionReal;
-
-    @NotNull(message = "El estado del préstamo es obligatorio")
-    @Min(1) @Max(3)
-    private Integer estado; // 1: Activo, 2: Devuelto, 3: Moroso
+        @Schema(description = "Fecha real en la que el usuario devolvió el libro (opcional al crear)", example = "null")
+        LocalDateTime fechaDevolucionReal,
+        
+        @NotNull(message = "El estado del préstamo es obligatorio")
+        @Min(1) @Max(3)
+        @Schema(description = "Estado actual del préstamo (1: Activo, 2: Devuelto, 3: Moroso)", example = "1")
+        Integer estado // 1: Activo, 2: Devuelto, 3: Moroso
+) {
 }

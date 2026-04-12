@@ -31,3 +31,13 @@ spring:
     livereload:
       enabled: true
 
+jwt:
+  secret: bxsdgergdvdfsnfioeniroto
+  expiration: 864000
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/.html

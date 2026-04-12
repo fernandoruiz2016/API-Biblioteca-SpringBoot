@@ -45,10 +45,10 @@ public class PrestamoServiceImpl implements PrestamoService {
     public PrestamoResponseDto create(PrestamoRequestDto prestamoRequestDto) {
         log.info("Create Prestamo: {}", prestamoRequestDto);
 
-        Libro libro = libroRepository.findById(prestamoRequestDto.getIdLibro())
+        Libro libro = libroRepository.findById(prestamoRequestDto.idLibro())
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
-        Usuario usuario = usuarioRepository.findById(prestamoRequestDto.getIdUsuario())
+        Usuario usuario = usuarioRepository.findById(prestamoRequestDto.idUsuario())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (libro.getStock() <= 0) {

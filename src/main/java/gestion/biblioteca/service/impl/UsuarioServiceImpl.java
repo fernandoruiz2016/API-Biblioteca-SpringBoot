@@ -39,16 +39,22 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public UsuarioResponseDto create(UsuarioRequestDto usuarioRequestDto) {
-        log.info("Create Usuario: {}", usuarioRequestDto);
-        Rol rol = rolRepository.findById(usuarioRequestDto.getIdRol())
-                .orElseThrow(() -> new RuntimeException("Error al buscar el Rol"));
+        log.info("Iniciando creación de usuario: {}", usuarioRequestDto.username());
+
+        Rol rol = rolRepository.findById(usuarioRequestDto.idRol())
+                .orElseThrow(() -> new RuntimeException("Error: El Rol especificado no existe"));
 
         Usuario usuario = usuarioMapper.toEntity(usuarioRequestDto);
-        usuario.setRol(rol);
 
-        log.info("Creando el usuario: {}", usuario.getIdUsuario());
+        usuario.getRoles().add(rol);
 
-        return usuarioMapper.toResponse(usuarioRepository.save(usuario));
+        usuario.setUsuarioCreacion("SISTEMA");
+        usuario.setIpCreacion("127.0.0.1");
+
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+        log.info("Usuario guardado exitosamente con ID: {}", usuarioGuardado.getIdUsuario());
+
+        return usuarioMapper.toResponse(usuarioGuardado);
     }
 
     @Override
