@@ -18,11 +18,12 @@ public record RegisterRequest(
         @Schema(example = "123456")
         String password,
 
-        @Size(min = 6, max = 30, message = "El email debe tener entre 6 y 30 caracteres")
-        @Schema(example = "123456")
+        @NotBlank(message = "El correo electrónico es obligatorio")
+        @Size(min = 6, max = 30, message = "El correo debe tener entre 6 y 30 caracteres")
+        @Schema(example = "example@email.com")
         String email,
 
-        @Schema(description = "Roles: ADMIN | USER | RRHH")
+        @Schema(description = "Roles: ADMIN | USER")
         Set<String> roles
 ) {
 }

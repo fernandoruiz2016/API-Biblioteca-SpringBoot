@@ -1,10 +1,11 @@
 package gestion.biblioteca.service.impl;
 
 import gestion.biblioteca.dto.auth.RegisterRequest;
-import gestion.biblioteca.entity.Rol;
-import gestion.biblioteca.repository.RolRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import gestion.biblioteca.dto.request.UsuarioRequestDto;
@@ -13,7 +14,9 @@ import gestion.biblioteca.entity.Usuario;
 import gestion.biblioteca.mapper.UsuarioMapper;
 import gestion.biblioteca.repository.UsuarioRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,7 +29,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional (readOnly = true)
     public List<UsuarioResponseDto> findAll() {
-        return usuarioMapper.toResponseList(usuarioRepository.findAll());
+        return usuarioRepository.findAll().stream()
+                .filter(u -> u.getEstado() == 1)
+                .map(usuarioMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -54,18 +60,39 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public UsuarioResponseDto update(Long idUsuario, UsuarioRequestDto usuarioRequestDto) {
-        Usuario usuario = usuarioRepository.findById((long) Integer.parseInt(idUsuario.toString()))
+        Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Error al buscar el usuario"));
+
         usuarioMapper.updateFromRequest(usuarioRequestDto, usuario);
+
+        usuario.setUsuarioModificacion(obtenerUsuarioLogueado());
+        usuario.setFechaModificacion(LocalDateTime.now());
+        usuario.setIpModificacion("127.0.0.1");
+
         return usuarioMapper.toResponse(usuarioRepository.save(usuario));
     }
 
     @Override
     @Transactional
     public void delete(Long idUsuario) {
-        if(!usuarioRepository.existsById((long) Integer.parseInt(idUsuario.toString()))) {
-            throw new RuntimeException("No existe el id del usuario");
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Error al buscar el usuario"));
+        usuario.setEstado(0);
+
+        usuario.setUsuarioModificacion(obtenerUsuarioLogueado());
+        usuario.setFechaModificacion(LocalDateTime.now());
+        usuario.setIpModificacion("127.0.0.1");
+
+        usuarioRepository.save(usuario);
+
+        log.info("Usuario con ID {} desactivado", idUsuario);
+    }
+
+    private String obtenerUsuarioLogueado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
         }
-        usuarioRepository.deleteById((long) Integer.parseInt(idUsuario.toString()));
+        return "SYSTEM_ANONYMOUS";
     }
 }

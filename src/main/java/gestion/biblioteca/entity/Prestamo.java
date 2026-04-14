@@ -62,13 +62,37 @@ public class Prestamo {
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
 
+        String username = getAuthenticatedUser();
+        this.usuarioCreacion = username;
+
         if (this.estado == null) {
             this.estado = 1;
+        }
+
+        if (this.ipCreacion == null) {
+            this.ipCreacion = "127.0.0.1";
         }
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.fechaModificacion = LocalDateTime.now();
+        this.usuarioModificacion = getAuthenticatedUser();
+
+        if (this.ipModificacion == null) {
+            this.ipModificacion = "127.0.0.1";
+        }
+    }
+
+    private String getAuthenticatedUser() {
+        org.springframework.security.core.Authentication authentication =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated() &&
+                !(authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+            return authentication.getName();
+        }
+
+        return "SYSTEM_ADMIN"; // Usuario por defecto
     }
 }

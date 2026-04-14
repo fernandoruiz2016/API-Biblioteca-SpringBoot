@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class AuthServiceImpl {
     private Set<Rol> definirRoles(Set<String> roles) {
         Set<Rol> roleSet = new HashSet<>();
         if (roles == null || roles.isEmpty()) {
-            roleSet.add(rolRepository.findByNombre("RRHH")
+            roleSet.add(rolRepository.findByNombre("USER")
                     .orElseThrow(()-> new IllegalArgumentException("Rol no encontrado")));
         }
         else {
@@ -100,9 +101,8 @@ public class AuthServiceImpl {
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(loginRequest.username());
 
         //3 3. Extraer los roles
-        Set<String> roles = userDetails.getUsuario().getRoles()
-                .stream()
-                .map(Rol::getNombre)
+        Set<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority) // Esto traerá "ROLE_ADMIN"
                 .collect(Collectors.toSet());
         //4. Generar el jwt
         log.info("Login exitoso del usaurio: {} con roles {}", loginRequest.username(), roles);

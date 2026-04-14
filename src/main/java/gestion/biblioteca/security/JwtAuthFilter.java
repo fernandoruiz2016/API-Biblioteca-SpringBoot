@@ -54,6 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             {
                 log.debug("Jwt token para usuario: {} con los roles: {}", username, userDetails.getAuthorities());
 
+                log.info("Autoridades cargadas en el filtro: {}", userDetails.getAuthorities());
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
