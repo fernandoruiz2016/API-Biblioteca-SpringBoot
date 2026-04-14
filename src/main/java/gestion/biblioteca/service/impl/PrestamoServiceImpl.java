@@ -79,11 +79,24 @@ public class PrestamoServiceImpl implements PrestamoService {
 
         prestamoMapper.updateFromRequest(prestamoRequestDto, prestamo);
 
-        prestamo.setUsuarioModificacion(obtenerUsuarioLogueado());
+        Usuario usuario = usuarioRepository.findById(prestamoRequestDto.idUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Libro libro = libroRepository.findById(prestamoRequestDto.idLibro())
+                .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
+
+        prestamo.setUsuario(usuario);
+        prestamo.setLibro(libro);
+
+        String userLogueado = obtenerUsuarioLogueado();
+        log.info("Actualizando préstamo {} por usuario: {}", idPrestamo, userLogueado);
+
+        prestamo.setUsuarioModificacion(userLogueado);
         prestamo.setFechaModificacion(LocalDateTime.now());
         prestamo.setIpModificacion("127.0.0.1");
 
-        return prestamoMapper.toResponse(prestamoRepository.save(prestamo));
+        Prestamo actualizado = prestamoRepository.saveAndFlush(prestamo);
+
+        return prestamoMapper.toResponse(actualizado);
     }
 
     @Override

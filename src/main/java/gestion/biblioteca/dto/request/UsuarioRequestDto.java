@@ -22,14 +22,12 @@ public record UsuarioRequestDto(
         @Size(min = 6, max = 20, message = "La contraseña debe tener entre 6 y 20 caracteres")
         @Schema(description = "Contraseña de acceso", example = "xxxxxx")
         String password,
-        
-        @NotNull(message = "El estado es obligatorio")
+
         @Min(0)
         @Max(1)
         @Schema(description = "Estado de la cuenta (1: Activo, 0: Suspendido/Inactivo)", example = "1")
         Integer estado,
-        
-        @NotNull(message = "Debe asignar un rol al usuario")
+
         @Schema(description = "Roles que se asignarán al usuario", example = "ADMIN")
         Set<String> roles
 ) {}

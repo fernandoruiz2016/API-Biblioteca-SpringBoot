@@ -27,8 +27,7 @@ public record PrestamoRequestDto(
 
         @Schema(description = "Fecha real en la que el usuario devolvió el libro (opcional al crear)", example = "null")
         LocalDateTime fechaDevolucionReal,
-        
-        @NotNull(message = "El estado del préstamo es obligatorio")
+
         @Min(1) @Max(3)
         @Schema(description = "Estado actual del préstamo (1: Activo, 2: Devuelto, 3: Moroso)", example = "1")
         Integer estado // 1: Activo, 2: Devuelto, 3: Moroso

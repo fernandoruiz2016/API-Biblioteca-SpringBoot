@@ -3,11 +3,13 @@ package gestion.biblioteca.config;
 import gestion.biblioteca.entity.Rol;
 import gestion.biblioteca.repository.RolRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -16,23 +18,28 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (rolRepository.count() == 0) {
-            Rol admin = Rol.builder()
-                    .nombre("ADMIN")
+        // Un solo método run que centraliza la lógica
+        log.info("Iniciando la verificación de roles en la base de datos...");
+
+        crearRolSiNoExiste("ADMIN", "Administrador del sistema");
+        crearRolSiNoExiste("USER", "Usuario estándar");
+    }
+
+    private void crearRolSiNoExiste(String nombre, String descripcion) {
+        if (rolRepository.findByNombre(nombre).isEmpty()) {
+            Rol rol = Rol.builder()
+                    .nombre(nombre)
+                    .descripcion(descripcion)
                     .estado(1)
                     .usuarioCreacion("SYSTEM")
                     .fechaCreacion(LocalDateTime.now())
+                    .ipCreacion("127.0.0.1")
                     .build();
 
-            Rol user = Rol.builder()
-                    .nombre("USER")
-                    .estado(1)
-                    .usuarioCreacion("SYSTEM")
-                    .fechaCreacion(LocalDateTime.now())
-                    .build();
-
-            rolRepository.save(admin);
-            rolRepository.save(user);
+            rolRepository.save(rol);
+            log.info("Rol {} creado exitosamente.", nombre);
+        } else {
+            log.info("El rol {} ya existe, saltando creación.", nombre);
         }
     }
 }
