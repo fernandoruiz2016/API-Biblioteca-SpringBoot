@@ -9,14 +9,18 @@ import java.util.Set;
 @Schema(description = "Clase (record) que permite registrar un nuevo usuario")
 public record RegisterRequest(
         @NotBlank(message = "El username es obligatorio")
-        @Size(min = 8, max = 30, message = "El usuario debe tener como mínimo 8 y 30 caracteres")
+        @Size(min = 8, max = 30, message = "El usuario debe tener entre 8 y 30 caracteres")
         @Schema(example = "jperez")
         String username,
 
         @NotBlank(message = "El password es obligatorio")
-        @Size(min = 6, max = 20, message = "El password debe tener como mínimo 6 y 20 caracteres")
+        @Size(min = 6, max = 20, message = "El password debe tener entre 6 y 20 caracteres")
         @Schema(example = "123456")
         String password,
+
+        @Size(min = 6, max = 30, message = "El email debe tener entre 6 y 30 caracteres")
+        @Schema(example = "123456")
+        String email,
 
         @Schema(description = "Roles: ADMIN | USER | RRHH")
         Set<String> roles

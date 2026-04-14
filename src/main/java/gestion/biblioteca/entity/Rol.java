@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table (name = "tm_rol")
@@ -47,8 +48,8 @@ public class Rol {
     @Column(name = "sipmodificacion", length = 20)
     private String ipModificacion;
 
-    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
-    private List<Usuario> usuarios;
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<Usuario> usuarios;
 
     @PrePersist
     protected void onCreate() {

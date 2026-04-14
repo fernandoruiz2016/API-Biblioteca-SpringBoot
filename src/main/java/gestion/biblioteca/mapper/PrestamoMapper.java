@@ -17,7 +17,7 @@ public interface PrestamoMapper {
     @Mapping(source = "libro.idLibro", target = "idLibro")
     @Mapping(source = "libro.titulo", target = "tituloLibro")
     @Mapping(source = "usuario.idUsuario", target = "idUsuario")
-    @Mapping(source = "usuario.apellido", target = "apellidoUsuario")
+    @Mapping(source = "usuario.username", target = "usernameUsuario")
     PrestamoResponseDto toResponse(Prestamo prestamo);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

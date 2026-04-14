@@ -1,5 +1,6 @@
 package gestion.biblioteca.service.impl;
 
+import gestion.biblioteca.dto.auth.RegisterRequest;
 import gestion.biblioteca.entity.Rol;
 import gestion.biblioteca.repository.RolRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.List;
 public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
+    private final AuthServiceImpl authService;
 
     @Override
     @Transactional (readOnly = true)
@@ -39,22 +40,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public UsuarioResponseDto create(UsuarioRequestDto usuarioRequestDto) {
-        log.info("Iniciando creación de usuario: {}", usuarioRequestDto.username());
+        RegisterRequest registerRequest = new RegisterRequest(
+                usuarioRequestDto.username(),
+                usuarioRequestDto.password(),
+                usuarioRequestDto.email(),
+                usuarioRequestDto.roles()
+        );
 
-        Rol rol = rolRepository.findById(usuarioRequestDto.idRol())
-                .orElseThrow(() -> new RuntimeException("Error: El Rol especificado no existe"));
-
-        Usuario usuario = usuarioMapper.toEntity(usuarioRequestDto);
-
-        usuario.getRoles().add(rol);
-
-        usuario.setUsuarioCreacion("SISTEMA");
-        usuario.setIpCreacion("127.0.0.1");
-
-        Usuario usuarioGuardado = usuarioRepository.save(usuario);
-        log.info("Usuario guardado exitosamente con ID: {}", usuarioGuardado.getIdUsuario());
-
-        return usuarioMapper.toResponse(usuarioGuardado);
+        // Usamos la lógica que ya funciona en AuthService
+        return authService.register(registerRequest);
     }
 
     @Override

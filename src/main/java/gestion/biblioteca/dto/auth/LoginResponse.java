@@ -21,4 +21,8 @@ public record LoginResponse(
         @Schema(description = "Tiempo de expiración en milisegundos", example = "86400000")
         long expiracionms
 ) {
+        public static LoginResponse of(String token, String username,Set<String> roles, long expiracionms)
+        {
+                return new LoginResponse(token, "Bearer", username, roles, expiracionms);
+        }
 }

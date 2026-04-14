@@ -11,8 +11,8 @@ public interface PrestamoRepository  extends JpaRepository<Prestamo,Long> {
     @Query("SELECT p FROM Prestamo p WHERE UPPER(p.libro.titulo) LIKE UPPER(CONCAT('%', :titulo, '%'))")
     List<Prestamo> findByLibroTitulo(@Param("titulo") String titulo);
 
-    @Query("SELECT p FROM Prestamo p WHERE UPPER(p.usuario.apellido) LIKE UPPER(CONCAT('%', :apellido, '%'))")
-    List<Prestamo> findByUsuarioApellido(@Param("apellido") String apellido);
+    @Query("SELECT p FROM Prestamo p WHERE UPPER(p.usuario.username) LIKE UPPER(CONCAT('%', :username, '%'))")
+    List<Prestamo> findByUsuarioUsername(@Param("username") String username);
 
     List<Prestamo> findByUsuario_IdUsuario(Long idUsuario);
 

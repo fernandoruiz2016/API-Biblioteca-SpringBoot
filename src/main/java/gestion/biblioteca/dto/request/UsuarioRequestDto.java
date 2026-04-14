@@ -3,6 +3,8 @@ package gestion.biblioteca.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+import java.util.Set;
+
 @Schema(description= "DTO para las solicitudes de Usuarios")
 public record UsuarioRequestDto(
         @NotBlank(message = "El nombre es obligatorio")
@@ -28,6 +30,6 @@ public record UsuarioRequestDto(
         Integer estado,
         
         @NotNull(message = "Debe asignar un rol al usuario")
-        @Schema(description = "ID del rol principal que se asignará al usuario", example = "1")
-        Long idRol
+        @Schema(description = "Roles que se asignarán al usuario", example = "ADMIN")
+        Set<String> roles
 ) {}
