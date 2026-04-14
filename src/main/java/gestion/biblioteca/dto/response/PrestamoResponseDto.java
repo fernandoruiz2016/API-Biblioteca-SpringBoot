@@ -9,7 +9,7 @@ public record PrestamoResponseDto(
         String tituloLibro,
 
         Long idUsuario,
-        String nombreCompletoUsuario,
+        String usernameUsuario,
 
         LocalDateTime fechaPrestamo,
         LocalDateTime fechaDevolucionEsperada,

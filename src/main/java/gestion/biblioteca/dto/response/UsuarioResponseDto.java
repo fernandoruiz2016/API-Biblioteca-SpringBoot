@@ -1,11 +1,11 @@
 package gestion.biblioteca.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public record UsuarioResponseDto(
         Long idUsuario,
-        String nombre,
-        String apellido,
+        String username,
         String email,
         Integer estado,
 
@@ -16,6 +16,5 @@ public record UsuarioResponseDto(
         String ipCreacion,
         String ipModificacion,
 
-        Long idRol,
-        String nombreRol
+        Set<String> roles
 ) {}

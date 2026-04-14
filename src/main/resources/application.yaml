@@ -7,7 +7,7 @@ spring:
   application:
     name: biblioteca
   datasource:
-    url: jdbc:postgresql://localhost:5432/BD_BIBLIOTECA?currentSchema=bd_gestionBiblioteca
+    url: jdbc:postgresql://localhost:5432/BD_BIBLIOTECA?currentSchema=bd_gestionbiblioteca
     username: postgres
     password: 123456
     driver-class-name: org.postgresql.Driver
@@ -31,3 +31,22 @@ spring:
     livereload:
       enabled: true
 
+jwt:
+  secret: bxsdgergdvdfsnfioenirotoqweerttyuuiosdffghjhcvbxdfrgtn
+  expiration: 864000
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/.html
+
+logging:
+  level:
+    pe:
+      edu:
+        idat: DEBUG
+    org:
+      springframework:
+        security: INFO

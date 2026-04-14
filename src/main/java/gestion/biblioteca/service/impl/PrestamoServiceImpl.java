@@ -1,20 +1,24 @@
 package gestion.biblioteca.service.impl;
 
 import gestion.biblioteca.entity.Libro;
+import gestion.biblioteca.entity.Prestamo;
 import gestion.biblioteca.entity.Usuario;
 import gestion.biblioteca.repository.LibroRepository;
 import gestion.biblioteca.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import gestion.biblioteca.dto.request.PrestamoRequestDto;
 import gestion.biblioteca.dto.response.PrestamoResponseDto;
-import gestion.biblioteca.entity.Prestamo;
 import gestion.biblioteca.mapper.PrestamoMapper;
 import gestion.biblioteca.repository.PrestamoRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,7 +33,10 @@ public class PrestamoServiceImpl implements PrestamoService {
     @Override
     @Transactional (readOnly = true)
     public List<PrestamoResponseDto> findAll() {
-        return prestamoMapper.toResponseList(prestamoRepository.findAll());
+        return prestamoRepository.findAll().stream()
+                .filter(u -> u.getEstado() == 1)
+                .map(prestamoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -45,10 +52,10 @@ public class PrestamoServiceImpl implements PrestamoService {
     public PrestamoResponseDto create(PrestamoRequestDto prestamoRequestDto) {
         log.info("Create Prestamo: {}", prestamoRequestDto);
 
-        Libro libro = libroRepository.findById(prestamoRequestDto.getIdLibro())
+        Libro libro = libroRepository.findById(prestamoRequestDto.idLibro())
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
-        Usuario usuario = usuarioRepository.findById(prestamoRequestDto.getIdUsuario())
+        Usuario usuario = usuarioRepository.findById(prestamoRequestDto.idUsuario())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (libro.getStock() <= 0) {
@@ -60,8 +67,6 @@ public class PrestamoServiceImpl implements PrestamoService {
         prestamo.setUsuario(usuario);
 
         libro.setStock(libro.getStock() - 1);
-        prestamo.setUsuarioCreacion("SISTEMA"); // Temporal hasta tener JWT
-        prestamo.setIpCreacion("127.0.0.1");
 
         return prestamoMapper.toResponse(prestamoRepository.save(prestamo));
     }
@@ -69,18 +74,39 @@ public class PrestamoServiceImpl implements PrestamoService {
     @Override
     @Transactional
     public PrestamoResponseDto update(Long idPrestamo, PrestamoRequestDto prestamoRequestDto) {
-        Prestamo prestamo = prestamoRepository.findById((long) Integer.parseInt(idPrestamo.toString()))
+        Prestamo prestamo = prestamoRepository.findById(idPrestamo)
                 .orElseThrow(() -> new RuntimeException("Error al buscar el prestamo"));
+
         prestamoMapper.updateFromRequest(prestamoRequestDto, prestamo);
+
+        prestamo.setUsuarioModificacion(obtenerUsuarioLogueado());
+        prestamo.setFechaModificacion(LocalDateTime.now());
+        prestamo.setIpModificacion("127.0.0.1");
+
         return prestamoMapper.toResponse(prestamoRepository.save(prestamo));
     }
 
     @Override
     @Transactional
     public void delete(Long idPrestamo) {
-        if(!prestamoRepository.existsById((long) Integer.parseInt(idPrestamo.toString()))) {
-            throw new RuntimeException("No existe el id del prestamo");
+        Prestamo prestamo = prestamoRepository.findById(idPrestamo)
+                .orElseThrow(() -> new RuntimeException("Error al buscar el prestamo"));
+        prestamo.setEstado(0);
+
+        prestamo.setUsuarioModificacion(obtenerUsuarioLogueado());
+        prestamo.setFechaModificacion(LocalDateTime.now());
+        prestamo.setIpModificacion("127.0.0.1");
+
+        prestamoRepository.save(prestamo);
+
+        log.info("Prestamo con ID {} desactivado", idPrestamo);
+    }
+
+    private String obtenerUsuarioLogueado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
         }
-        prestamoRepository.deleteById((long) Integer.parseInt(idPrestamo.toString()));
+        return "SYSTEM_ANONYMOUS";
     }
 }
