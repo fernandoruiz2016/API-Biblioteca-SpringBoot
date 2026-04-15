@@ -39,9 +39,9 @@ public class SecurityConfig
                         ///  Estas ruta no necesitan tener una autenticación, estan públicas
                         auth -> auth.requestMatchers(
                                         "/auth/**",
+                                        "/v3/api-docs/**",
                                         "/swagger-ui/**",
-                                        "/swagger-ui.html",
-                                        "/v3/api-docs/**"
+                                        "/swagger-ui.html"
                                 ).permitAll()
 
                                 .requestMatchers(HttpMethod.GET, "/api/libros/**").hasAnyRole("ADMIN", "USER")
