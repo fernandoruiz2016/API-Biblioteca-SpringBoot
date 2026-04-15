@@ -30,7 +30,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional (readOnly = true)
     public List<UsuarioResponseDto> findAll() {
         return usuarioRepository.findAll().stream()
-                .filter(u -> u.getEstado() == 1)
+                //.filter(u -> u.getEstado() == 1)
                 .map(usuarioMapper::toResponse)
                 .collect(Collectors.toList());
     }

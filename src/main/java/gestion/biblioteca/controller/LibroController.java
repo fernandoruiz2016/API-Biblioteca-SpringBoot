@@ -60,7 +60,7 @@ public class LibroController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar un libro",
-            description = "Cambia el estado del libro a 0 para que no aparezca en las búsquedas.")
+            description = "Realiza la eliminación del rol.")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         libroService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Libro eliminado correctamente", null));

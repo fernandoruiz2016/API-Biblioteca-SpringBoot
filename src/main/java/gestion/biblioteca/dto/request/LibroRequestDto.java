@@ -27,7 +27,7 @@ public record LibroRequestDto(
 
         @Min(0)
         @Max(1)
-        @Schema(description = "Estado del registro (1: Activo, 0: Inactivo)", example = "1")
+        @Schema(description = "Estado del registro (1: Disponible, 0: Inactivo)", example = "1")
         Integer estado
 ) {
     

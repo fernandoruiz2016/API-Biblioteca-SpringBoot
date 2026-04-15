@@ -65,4 +65,12 @@ public class PrestamoController {
         prestamoService.delete(id);
         return ResponseEntity.ok(ApiResponse.ok("Prestamo eliminado correctamente", null));
     }
+
+    @PatchMapping("/{id}/devolver")
+    @Operation(summary = "Procesar devolución",
+            description = "Finaliza un préstamo activo, cambia su estado a 1 y reintegra el libro al stock.")
+    public ResponseEntity<ApiResponse<Void>> devolver(@PathVariable Long id) {
+        prestamoService.devolver(id);
+        return ResponseEntity.ok(ApiResponse.ok("Libro devuelto correctamente y stock actualizado", null));
+    }
 }

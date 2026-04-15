@@ -34,7 +34,7 @@ public class PrestamoServiceImpl implements PrestamoService {
     @Transactional (readOnly = true)
     public List<PrestamoResponseDto> findAll() {
         return prestamoRepository.findAll().stream()
-                .filter(u -> u.getEstado() == 1)
+                //.filter(u -> u.getEstado() >= 1)
                 .map(prestamoMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -50,7 +50,7 @@ public class PrestamoServiceImpl implements PrestamoService {
     @Override
     @Transactional
     public PrestamoResponseDto create(PrestamoRequestDto prestamoRequestDto) {
-        log.info("Create Prestamo: {}", prestamoRequestDto);
+        log.info("Iniciando registro de préstamo para libro ID: {}", prestamoRequestDto.idLibro());
 
         Libro libro = libroRepository.findById(prestamoRequestDto.idLibro())
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
@@ -59,14 +59,17 @@ public class PrestamoServiceImpl implements PrestamoService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (libro.getStock() <= 0) {
-            throw new RuntimeException("No hay stock disponible");
+            throw new RuntimeException("No hay stock disponible para el libro: " + libro.getTitulo());
         }
 
         Prestamo prestamo = prestamoMapper.toEntity(prestamoRequestDto);
         prestamo.setLibro(libro);
         prestamo.setUsuario(usuario);
 
+        prestamo.setEstado(1); // 1: prestamo activo
+
         libro.setStock(libro.getStock() - 1);
+        libroRepository.save(libro);
 
         return prestamoMapper.toResponse(prestamoRepository.save(prestamo));
     }
@@ -121,5 +124,31 @@ public class PrestamoServiceImpl implements PrestamoService {
             return authentication.getName();
         }
         return "SYSTEM_ANONYMOUS";
+    }
+
+    @Override
+    @Transactional
+    public void devolver(Long idPrestamo) {
+        Prestamo prestamo = prestamoRepository.findById(idPrestamo)
+                .orElseThrow(() -> new RuntimeException("Préstamo no encontrado"));
+
+        if (prestamo.getEstado() == 1) {
+            throw new RuntimeException("El libro '" + prestamo.getLibro().getTitulo() + "' ya fue devuelto anteriormente.");
+        }
+
+        Libro libro = prestamo.getLibro();
+        libro.setStock(libro.getStock() + 1);
+        libroRepository.save(libro);
+
+        prestamo.setEstado(2); //2: prestamo devuelto
+
+        prestamo.setFechaDevolucionReal(LocalDateTime.now());
+        prestamo.setFechaModificacion(LocalDateTime.now());
+        prestamo.setUsuarioModificacion(obtenerUsuarioLogueado());
+        prestamo.setIpModificacion("127.0.0.1");
+
+        prestamoRepository.save(prestamo);
+
+        log.info("Devolución exitosa. Libro: {} | Nuevo Stock: {}", libro.getTitulo(), libro.getStock());
     }
 }

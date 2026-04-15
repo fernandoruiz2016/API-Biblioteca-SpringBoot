@@ -28,7 +28,7 @@ public class LibroServiceImpl implements LibroService {
     @Transactional (readOnly = true)
     public List<LibroResponseDto> findAll() {
         return libroRepository.findAll().stream()
-                .filter(u -> u.getEstado() == 1)
+                //.filter(u -> u.getEstado() == 1)
                 .map(libroMapper::toResponse)
                 .collect(Collectors.toList());
     }
