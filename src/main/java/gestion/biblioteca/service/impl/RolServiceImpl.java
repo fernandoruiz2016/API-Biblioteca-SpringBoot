@@ -27,7 +27,7 @@ public class RolServiceImpl implements RolService {
     @Transactional (readOnly = true)
     public List<RolResponseDto> findAll() {
         return rolRepository.findAll().stream()
-                .filter(u -> u.getEstado() == 1)
+                //.filter(u -> u.getEstado() == 1)
                 .map(rolMapper::toResponse)
                 .collect(Collectors.toList());
     }

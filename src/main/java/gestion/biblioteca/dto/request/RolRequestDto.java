@@ -13,8 +13,7 @@ public record RolRequestDto(
         @Size(max = 150, message = "La descripción no puede exceder los 150 caracteres")
         @Schema(description = "Explicación breve de las funciones del rol", example = "Administrador con acceso total al sistema")
         String descripcion,
-        
-        @NotNull(message = "El estado es obligatorio")
+
         @Min(0)
         @Max(1)
         @Schema(description = "Estado del rol (1: Activo, 0: Inactivo)", example = "1")
